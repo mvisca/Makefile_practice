@@ -6,8 +6,15 @@ NAME	:= icecream
 #	INGREDIENTS							#
 #---------------------------------------#
 
-SRCS		:= main.c
-OBJS		:= main.o
+SRC_DIR		:= src
+OBJ_DIR		:= obj
+SRCS		:= 		\
+	main.c 			\
+	arom/arom.c		\
+	base/milk.c		\
+	base/water.c
+SRCS		:= $(SRCS:%=$(SRC_DIR)/%)
+OBJS		:= $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 INCLUDE		:= include
 
 CC			:= cc
@@ -20,8 +27,10 @@ CPPFLAGS	:= -I $(INCLUDE)
 #	UTENSILS							#
 #---------------------------------------#
 
-RM			:= rm -f
-MAKEFLAGS	+= --no-print-directorye
+RM			:= rm -fr
+MAKEFLAGS	+= --no-print-directory
+# Hides the report of directory switch in the stdoutput
+DIR_DUP		= mkdir -p $(@D)
 
 #---------------------------------------#
 #	RECIPES								#
@@ -30,20 +39,16 @@ MAKEFLAGS	+= --no-print-directorye
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
-	@# $(CC) $(CFLAGS) $(OBJS) $(NAME) 
-	@# Those two are equivalent
-	@# -o tells the compiler not to link
+	$(CC) $(OBJS) -o $@
 	$(info CREATED $(NAME))
 
-%.o: %.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(DIR_DUP)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
-	@# $(CC) $(CFLAGS) -c $@ -o $^ 
-	@# Those two are equivalent
 	$(info CREATED $@)
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJ_DIR)
 	$(info DELETED $(OBJS))
 
 fclean: clean
@@ -59,3 +64,4 @@ re:
 #---------------------------------------#
 
 .PHONY: clean fclean all
+.SILENT:

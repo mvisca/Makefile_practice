@@ -1,27 +1,41 @@
 ############################ INICIO #####
 
-NAME	:= icecream
+NAME	:= libicecream.a
 
 #---------------------------------------#
 #	INGREDIENTS							#
 #---------------------------------------#
 
-SRCS		:= main.c
-OBJS		:= main.o
+SRC_DIR		:= src
+BUILD_DIR	:= .build
 INCLUDE		:= include
+
+SRCS		:= 		\
+	arom/arom.c		\
+	base/milk.c		\
+	base/water.c
+SRCS		:= $(SRCS:%=$(SRC_DIR)/%)
+OBJS		:= $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+DEPS		:= $(OBJS:.o=.d)
 
 CC			:= cc
 CFLAGS		:= -Wall -Wextra -Werror
-CPPFLAGS	:= -I $(INCLUDE)
+CPPFLAGS	:= -MMD -MP -I $(INCLUDE)
 # -I <include_dir> allows to write the name of the .h file in the include, not the whole path
 # Here the .h file is inside the $(INCLUDES) directory
+# -MMD The compiler automatically generates a list of dependencies
+# -MP Prevents erros if a header file is rm/mv
+AR			:= ar
+ARFLAGS		:= -r -c -s
 
 #---------------------------------------#
 #	UTENSILS							#
 #---------------------------------------#
 
-RM			:= rm -f
-MAKEFLAGS	+= --no-print-directorye
+RM			:= rm -fr
+MAKEFLAGS	+= --no-print-directory
+# Hides the report of directory switch in the stdoutput
+DIR_DUP		= mkdir -p $(@D)
 
 #---------------------------------------#
 #	RECIPES								#
@@ -30,20 +44,17 @@ MAKEFLAGS	+= --no-print-directorye
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
-	@# $(CC) $(CFLAGS) $(OBJS) $(NAME) 
-	@# Those two are equivalent
-	@# -o tells the compiler not to link
+	@$(AR) $(ARFLAGS) $@ $^
 	$(info CREATED $(NAME))
 
-%.o: %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
-	@# $(CC) $(CFLAGS) -c $@ -o $^ 
-	@# Those two are equivalent
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@$(DIR_DUP)
+	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 	$(info CREATED $@)
+-include $(DEPS)
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(BUILD_DIR)
 	$(info DELETED $(OBJS))
 
 fclean: clean

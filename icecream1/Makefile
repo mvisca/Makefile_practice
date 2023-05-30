@@ -25,14 +25,12 @@ MAKEFLAGS	+= --no-print-directory
 
 all: $(NAME)
 
-# Linking
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@
 	# $(CC) $(CFLAGS) $(OBJS) $(NAME) 
 	# Those two are equivalent
 	# -o tells the compiler not to link
 
-# Compiling
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 	# $(CC) $(CFLAGS) -c $@ -o $^ 
