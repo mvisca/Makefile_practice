@@ -23,6 +23,7 @@ SRC_DIR		:= src
 SRCS		:= main.c
 SRCS		:= $(SRCS:%=$(SRC_DIR)/%)
 
+LIBS_DIR	:= $(dir $(LIBS_TARGET))
 BUILD_DIR	:= .build
 OBJS		:= $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 DEPS		:= $(OBJS:.o=.d)
